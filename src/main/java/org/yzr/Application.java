@@ -4,6 +4,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -11,13 +12,15 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.yzr.dropbox.DropboxTimerTask;
 
 import javax.annotation.Resource;
+import java.util.Timer;
 
 @SpringBootApplication
 //@EnableJpaRepositories("org.yzr.dao") // JPA扫描该包路径下的Repositorie
 //@EntityScan("org.yzr.model") // 扫描Entity实体类
-public class Application {
+public class Application implements CommandLineRunner {
     @Resource
     private Environment environment;
 
@@ -54,4 +57,10 @@ public class Application {
         return connector;
     }
 
+    @Override
+    public void run(String... args) throws Exception {
+        Timer timer = new Timer();
+        DropboxTimerTask task = new DropboxTimerTask();
+        timer.schedule(task, 6000, 60000*10);
+    }
 }
