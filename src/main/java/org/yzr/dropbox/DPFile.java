@@ -8,16 +8,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 class DPFile {
-    String name;
-    String id;
-    String pathDisplay;
-    String clientModified;
-    String rev;
+    private String name;
+    private String id;
+    private String pathDisplay;
+    private String clientModified;
+    private String rev;
 
 
-    String getCommitID() {
+    public String getCommitID() {
         String[] strArr = this.pathDisplay.split("/");
         return strArr[3].substring(0, 4);
     }
+
+    public boolean isEqualWithCommitID(String commitID) {
+        return getCommitID() == commitID;
+    }
+
 
 }
