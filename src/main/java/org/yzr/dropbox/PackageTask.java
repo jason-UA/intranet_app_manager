@@ -2,8 +2,10 @@ package org.yzr.dropbox;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
+import org.apache.tomcat.util.http.fileupload.ProgressListener;
 
 import java.io.*;
 
@@ -12,10 +14,14 @@ import static org.yzr.dropbox.DropboxTimerTask.ACCESSTOKEN;
 @Data
 @AllArgsConstructor
 @Slf4j
+@NoArgsConstructor
 public class PackageTask {
 
     public static final String DOWNLOADFILEURL = "https://content.dropboxapi.com/2/files/download";
     public static final String UPLOADFILEURL = "http://127.0.0.1:8081/app/upload";
+    public static final String PGYERUPLOADURL = "https://www.pgyer.com/apiv2/app/upload";
+    public static final String PGYERUSERKEY = "de9534c03ca2a8998560bed05ee77d36";
+    public static final String PGYERAPIKEY = "4926af72bab90e1efeb1b7c9c72da5be";
     private DPFile dpFile;
 
 
@@ -102,11 +108,51 @@ public class PackageTask {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    public void pgyerUpload(File file) {
+        OkHttpClient client = new OkHttpClient();
+        MultipartBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", "UARun.ipa",
+                        RequestBody.create(file, MediaType.parse("multipart/form-data")))
+                .addFormDataPart("_api_key", PGYERAPIKEY)
+                .addFormDataPart("buildInstallType", "2")
+                .addFormDataPart("buildPassword", "123456")
+                .build();
 
+        ExMultipartBody exMultipartBody = new ExMultipartBody(requestBody, new UploadProgressListener() {
+            @Override
+            public void onProgress(long total, long current) {
+                float process =  (((float) current / total) * 100);
+                log.info("pgyer upload precess: {}%", process);
+            }
+        });
+
+        Request request = new Request.Builder()
+                .url(PGYERUPLOADURL)
+                .post(exMultipartBody)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                // 请求失败
+                log.info("pgyer upload is fail");
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                // 请求成功
+                log.info("pgyer upload is Success");
+            }
+        });
     }
 
 
-
+    public static void main(String[] args) {
+        PackageTask task = new PackageTask();
+        File file = new File("/Users/jason/Desktop/Spring Boot/intranet_app_manager/dropboxPackage/efa0.ipa");
+        task.pgyerUpload(file);
+    }
 
 }
