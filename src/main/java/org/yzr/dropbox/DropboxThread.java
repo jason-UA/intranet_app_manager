@@ -21,11 +21,11 @@ public class DropboxThread extends Thread {
     public static final String USER = "root";
     public static final String PASSWORD = "123456";
     public static final String CLASSNAME = "com.mysql.cj.jdbc.Driver";
-    public static final String ACCESSTOKEN = "Bearer qPGuc1YP09AAAAAAAAAAEqBFo2eqhBKyfkRpf8NstkoFBXI9RmTr4TBVlmwFpd9_";
+    public static final String ACCESSTOKEN = "Bearer qPGuc1YP09AAAAAAAAAAGvz8s4bIABt6BXejMd7FNKZ9eppBmLz14USFJDXzcnfg";
     public static final String LISTFOLDERURL = "https://api.dropboxapi.com/2/files/list_folder";
     public static final String LISTFOLDERCONTINUEURL = "https://api.dropboxapi.com/2/files/list_folder/continue";
     public static final String DOWNLOADFILEURL = "https://content.dropboxapi.com/2/files/download";
-    public static final String UPLOADFILEURL = "http://127.0.0.1/app/upload";
+    public static final String UPLOADFILEURL = "http://127.0.0.1:8081/app/upload";
 
     @Override
     public void run() {
@@ -166,18 +166,20 @@ public class DropboxThread extends Thread {
             int size = 0;
             float len = 0;
             byte[] buf = new byte[10240];
+            int lastProcess = 0;
             while ((size = inputStream.read(buf)) != -1) {
                 len += size;
                 outputStream.write(buf, 0, size);
-                long process = (long) ((len / fileSize) * 100);
-                if ((process % 5) == 0){
-                    log.info("文件: {} ,下载了: {}",fileSize,  process);
+                int process = (int) ((len / fileSize) * 100);
+                if (process > lastProcess) {
+                    lastProcess = process;
+                    log.info("文件: {} ,下载了: {}%",fileSize,  process);
                 }
             }
             inputStream.close();
             outputStream.close();
             log.info("下载成功");
-            uploadFile(file);
+            uploadFile(file.getAbsolutePath());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -186,12 +188,12 @@ public class DropboxThread extends Thread {
 
     }
 
-    public static void uploadFile(File file) {
+    public void uploadFile(String file) {
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("file", "UARun.ipa",
-                        RequestBody.create(file, MediaType.parse("multipart/form-data")))
+                        RequestBody.create(new File(file), MediaType.parse("multipart/form-data")))
                 .build();
 
         Request request = new Request.Builder()
@@ -216,7 +218,8 @@ public class DropboxThread extends Thread {
 
     public static void main(String[] args) {
         DropboxThread thread = new DropboxThread();
-        thread.start();
+        thread.uploadFile("/Users/User2/Desktop/intranet_app_manager/dropboxPackage/b057.ipa");
+
     }
 
 
