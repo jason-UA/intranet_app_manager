@@ -15,18 +15,17 @@ import static org.yzr.dropbox.DropboxTimerTask.ACCESSTOKEN;
 public class PackageTask {
 
     public static final String DOWNLOADFILEURL = "https://content.dropboxapi.com/2/files/download";
-    public static final String UPLOADFILEURL = "http://127.0.0.1/app/upload";
+    public static final String UPLOADFILEURL = "http://127.0.0.1:8081/app/upload";
     private DPFile dpFile;
 
 
-    public boolean isEqualWithCommitID(String commitID) {
-        return dpFile.isEqualWithCommitID(commitID);
+    public boolean isEqual(DPFile file) {
+        return dpFile.getCommitID().equals(file.getCommitID());
     }
 
 
     public void start() {
         File downloadFile = downloadFile(dpFile.getPathDisplay(), dpFile.getName());
-        log.info("download file size: {}", downloadFile.getTotalSpace());
         localhostServiceUpload(downloadFile);
 
     }
@@ -43,7 +42,6 @@ public class PackageTask {
         try {
             Response response = call.execute();
             BufferedInputStream inputStream = new BufferedInputStream(response.body().byteStream());
-            response.close();
             String dropboxPackage = System.getProperty("user.dir") + File.separator + "dropboxPackage";
             File dbDir = new File(dropboxPackage);
             if (!dbDir.exists()) {
@@ -66,9 +64,10 @@ public class PackageTask {
                     lastProcess = process;
                     log.info("文件: {} ,下载了: {}%", fileSize, process);
                 }
-                }
+            }
             inputStream.close();
             outputStream.close();
+            response.close();
             log.info("下载成功");
             return file;
         } catch (FileNotFoundException e) {

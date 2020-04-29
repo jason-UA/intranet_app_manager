@@ -15,10 +15,19 @@ public class DropboxTimerTask extends TimerTask {
 
     public static final String LISTFOLDERURL = "https://api.dropboxapi.com/2/files/list_folder";
     public static final String LISTFOLDERCONTINUEURL = "https://api.dropboxapi.com/2/files/list_folder/continue";
-    public static final String ACCESSTOKEN = "Bearer qPGuc1YP09AAAAAAAAAAJTFayt7eJpu7mJWxA7g1h-mjMCM9THSrYJMunSyZBzK4";
+    public static final String ACCESSTOKEN = "Bearer qPGuc1YP09AAAAAAAAAAJ0zn3wNV7VDbLw3RM4jRQqRIPsuOETZn1Yzb3RrylD2K";
 
     @Override
     public void run() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                listFolder();
+            }
+        }).start();
+    }
+
+    public void listFolder() {
         OkHttpClient okHttpClient = new OkHttpClient();
         ListFolderRequest listRequest = new ListFolderRequest();
         RequestBody body =  RequestBody.create(JSON.toJSON(listRequest).toString(), MediaType.parse("application/json; charset=utf-8"));
@@ -99,7 +108,7 @@ public class DropboxTimerTask extends TimerTask {
         for (DPFile file: files) {
             if (AppDatabase.INSTANCE.isPackageExisted(file.getCommitID())) {
                 log.info(file.getPathDisplay() + " is exist in database!");
-            } else if (PackageTaskLoop.INSTANCE.isExistedInProcessQueue(file.getCommitID())){
+            } else if (PackageTaskLoop.INSTANCE.isExistedInProcessQueue(file)){
                 log.info(file.getPathDisplay() + " is exist in process queue!");
             } else {
                 log.info(file.getPathDisplay() + " will download and upload!");

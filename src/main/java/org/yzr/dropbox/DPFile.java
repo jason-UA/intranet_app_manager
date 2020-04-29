@@ -20,9 +20,6 @@ class DPFile {
         return strArr[3].substring(0, 4);
     }
 
-    public boolean isEqualWithCommitID(String commitID) {
-        return getCommitID() == commitID;
-    }
 
 
 }

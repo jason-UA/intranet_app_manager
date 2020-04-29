@@ -13,9 +13,9 @@ public enum  PackageTaskLoop {
 
     private List<PackageTask> packageTaskList;
 
-    public boolean isExistedInProcessQueue(String commitID) {
+    public boolean isExistedInProcessQueue(DPFile file) {
         for (PackageTask task : packageTaskList) {
-            if (task.isEqualWithCommitID(commitID)) {
+            if (task.isEqual(file)) {
                 return true;
             }
         }
