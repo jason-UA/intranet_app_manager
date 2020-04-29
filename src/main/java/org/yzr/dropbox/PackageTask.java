@@ -54,7 +54,7 @@ public class PackageTask {
             long fileSize = response.body().contentLength();
             int size = 0;
             float len = 0;
-            byte[] buf = new byte[10240];
+            byte[] buf = new byte[1024];
             int lastProcess = 0;
             while ((size = inputStream.read(buf)) != -1) {
                 len += size;
