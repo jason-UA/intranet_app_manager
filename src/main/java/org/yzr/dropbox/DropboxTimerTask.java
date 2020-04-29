@@ -15,7 +15,7 @@ public class DropboxTimerTask extends TimerTask {
 
     public static final String LISTFOLDERURL = "https://api.dropboxapi.com/2/files/list_folder";
     public static final String LISTFOLDERCONTINUEURL = "https://api.dropboxapi.com/2/files/list_folder/continue";
-    public static final String ACCESSTOKEN = "Bearer qPGuc1YP09AAAAAAAAAAImo3eaQ0GxT2N3JAKfkcEBDnynu_7pTiKKAUq3leduoH";
+    public static final String ACCESSTOKEN = "Bearer qPGuc1YP09AAAAAAAAAAJTFayt7eJpu7mJWxA7g1h-mjMCM9THSrYJMunSyZBzK4";
 
     @Override
     public void run() {
@@ -32,12 +32,18 @@ public class DropboxTimerTask extends TimerTask {
         try {
             //同步调用,返回Response,会抛出IO异常
             Response response = call.execute();
-            JSONObject result = JSON.parseObject(response.body().string());
-            List<DPFile> files = getTagFile(result);
-            if (result.getBoolean("has_more")) {
-                files.addAll(listFolderContinue(result));
+            if (response.isSuccessful()) {
+                JSONObject result = JSON.parseObject(response.body().string());
+                List<DPFile> files = getTagFile(result);
+                if (result.getBoolean("has_more")) {
+                    files.addAll(listFolderContinue(result));
+                }
+                createPackageTask(files);
+            } else {
+                log.error("deopbox folder list fail code: {}", response.code());
             }
-            createPackageTask(files);
+            response.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -78,6 +84,7 @@ public class DropboxTimerTask extends TimerTask {
             Response response = call.execute();
             JSONObject result = JSON.parseObject(response.body().string());
             List<DPFile> files = getTagFile(result);
+            response.close();
             if (result.getBoolean("has_more")) {
                 files.addAll(listFolderContinue(result));
             }

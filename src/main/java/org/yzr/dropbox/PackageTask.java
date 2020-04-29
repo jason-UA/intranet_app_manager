@@ -43,6 +43,7 @@ public class PackageTask {
         try {
             Response response = call.execute();
             BufferedInputStream inputStream = new BufferedInputStream(response.body().byteStream());
+            response.close();
             String dropboxPackage = System.getProperty("user.dir") + File.separator + "dropboxPackage";
             File dbDir = new File(dropboxPackage);
             if (!dbDir.exists()) {
@@ -56,14 +57,16 @@ public class PackageTask {
             int size = 0;
             float len = 0;
             byte[] buf = new byte[10240];
+            int lastProcess = 0;
             while ((size = inputStream.read(buf)) != -1) {
                 len += size;
                 outputStream.write(buf, 0, size);
-                long process = (long) ((len / fileSize) * 100);
-                if ((process % 5) == 0){
-                    log.info("文件: {} ,下载了: {}",fileSize,  process);
+                int process = (int) ((len / fileSize) * 100);
+                if (process > lastProcess) {
+                    lastProcess = process;
+                    log.info("文件: {} ,下载了: {}%", fileSize, process);
                 }
-            }
+                }
             inputStream.close();
             outputStream.close();
             log.info("下载成功");
@@ -96,6 +99,7 @@ public class PackageTask {
             } else {
                 log.info("localhost Service Upload is fail");
             }
+            response.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
