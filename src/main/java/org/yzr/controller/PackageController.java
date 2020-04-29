@@ -2,6 +2,7 @@ package org.yzr.controller;
 
 
 import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Controller;
@@ -26,7 +27,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
+@Slf4j
 @Controller
 public class PackageController {
     @Resource
@@ -89,6 +90,7 @@ public class PackageController {
         Map<String, Object> map = new HashMap<>();
         try {
             String filePath = transfer(file);
+            log.debug("package save in {}", filePath);
             Package aPackage = this.packageService.buildPackage(filePath);
             Map<String , String> extra = new HashMap<>();
             String jobName = request.getParameter("jobName");

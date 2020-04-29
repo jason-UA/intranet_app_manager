@@ -61,6 +61,6 @@ public class Application implements CommandLineRunner {
     public void run(String... args) throws Exception {
         Timer timer = new Timer();
         DropboxTimerTask task = new DropboxTimerTask();
-        timer.schedule(task, 6000, 60000);
+        timer.schedule(task, 6000, 60000*5);
     }
 }
