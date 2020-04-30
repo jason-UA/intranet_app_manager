@@ -15,7 +15,7 @@ public class DropboxTimerTask extends TimerTask {
 
     public static final String LISTFOLDERURL = "https://api.dropboxapi.com/2/files/list_folder";
     public static final String LISTFOLDERCONTINUEURL = "https://api.dropboxapi.com/2/files/list_folder/continue";
-    public static final String ACCESSTOKEN = "Bearer qPGuc1YP09AAAAAAAAAALIE4BLt4KmH0qHvXYkpdhoWg-F3Utg0NQzUDxkoGY1dg";
+    public static final String ACCESSTOKEN = "Bearer qPGuc1YP09AAAAAAAAAAL-MTXtttiZB6AKP_i8-QqB7MY6dmM7jxpWETG_4-odRU";
 
     @Override
     public void run() {
