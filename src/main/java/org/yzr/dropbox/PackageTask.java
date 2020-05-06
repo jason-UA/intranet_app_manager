@@ -53,19 +53,19 @@ public class PackageTask {
             if (!dbDir.exists()) {
                 dbDir.mkdirs();
             }
-            File file = new File(dbDir, fileName + ".ipa");
-            log.info(file.getAbsolutePath());
-
+            File file = new File(dbDir, fileName);
             OutputStream outputStream = new FileOutputStream(file);
             long fileSize = response.body().contentLength();
+            log.info("{}, {}", file.getAbsolutePath(), fileSize);
             int size = 0;
-            float len = 0;
+            long len = 0;
             byte[] buf = new byte[1024];
             int lastProcess = 0;
             while ((size = inputStream.read(buf)) != -1) {
                 len += size;
                 outputStream.write(buf, 0, size);
-                int process = (int) ((len / fileSize) * 100);
+                float p = len / (float)fileSize;
+                int process = (int) (p * 100);
                 if (process > lastProcess) {
                     lastProcess = process;
                     log.info("文件: {} ,下载了: {}%", fileSize, process);
@@ -74,8 +74,13 @@ public class PackageTask {
             inputStream.close();
             outputStream.close();
             response.close();
-            log.info("下载成功");
-            return file;
+            if (fileSize == len) {
+                log.info("下载成功");
+                return file;
+            } else {
+                log.error("下载失败！");
+                return null;
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -151,7 +156,7 @@ public class PackageTask {
 
     public static void main(String[] args) {
         PackageTask task = new PackageTask();
-        File file = new File("/Users/jason/Desktop/Spring Boot/intranet_app_manager/dropboxPackage/efa0.ipa");
+        File file = new File("/Users/User2/Desktop/intranet_app_manager/dropboxPackage/MapMyRun.ipa");
         task.pgyerUpload(file);
     }
 
